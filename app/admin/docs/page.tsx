@@ -70,6 +70,7 @@ export default function AdminDocsPage() {
   // UI State
   const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [isTocCollapsed, setIsTocCollapsed] = useState(true);
 
   // Load secret from localStorage on mount
   useEffect(() => {
@@ -1102,7 +1103,7 @@ export default function AdminDocsPage() {
                       </div>
 
                       {/* Preview Content */}
-                      <div className="flex-1 flex overflow-hidden">
+                      <div className="flex-1 flex overflow-hidden relative">
                         {/* Main preview pane */}
                         <div className="flex-1 overflow-y-auto" id="preview-scroll-container">
                           <div className="mdp-wrapper">
@@ -1144,29 +1145,51 @@ export default function AdminDocsPage() {
 
                         {/* Table of Contents sidebar */}
                         {renderedPreview.toc.length > 0 && (
-                          <aside className="hidden lg:flex flex-col w-52 shrink-0 bg-white/40 dark:bg-zinc-900/20 overflow-y-auto">
-                            <div className="sticky top-0 p-4">
-                              <div className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                                <List className="w-3 h-3" />
-                                目录 ({renderedPreview.toc.length})
-                              </div>
-                              <nav className="space-y-0.5">
-                                {renderedPreview.toc.map((item, idx) => (
+                          isTocCollapsed ? (
+                            <button
+                              type="button"
+                              onClick={() => setIsTocCollapsed(false)}
+                              className="absolute right-0 top-1/4 z-20 bg-zinc-900/90 dark:bg-zinc-800/90 hover:bg-zinc-950 dark:hover:bg-zinc-750 text-white rounded-l-lg py-4 px-1.5 flex flex-col items-center gap-1 shadow-md border border-r-0 border-zinc-800 dark:border-zinc-700 transition-all text-[10px] font-bold leading-none select-none cursor-pointer"
+                              title="展开目录"
+                            >
+                              <span>目</span>
+                              <span>录</span>
+                            </button>
+                          ) : (
+                            <aside className="hidden lg:flex flex-col w-52 shrink-0 bg-white/40 dark:bg-zinc-900/20 overflow-y-auto">
+                              <div className="sticky top-0 p-4">
+                                <div className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-3 flex items-center justify-between">
+                                  <div className="flex items-center gap-1.5">
+                                    <List className="w-3 h-3" />
+                                    目录 ({renderedPreview.toc.length})
+                                  </div>
                                   <button
-                                    key={idx}
                                     type="button"
-                                    onClick={() => scrollToHeading(item.id)}
-                                    className={`block w-full text-left text-[11px] leading-snug py-1 px-2 rounded transition-colors hover:bg-slate-100 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 ${
-                                      item.level === 1 ? 'font-semibold' : item.level === 2 ? 'pl-4' : 'pl-7 text-[10px]'
-                                    }`}
-                                    title={item.text}
+                                    onClick={() => setIsTocCollapsed(true)}
+                                    className="p-1 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded text-zinc-400 hover:text-zinc-650 dark:hover:text-zinc-350 transition-colors cursor-pointer"
+                                    title="收起目录"
                                   >
-                                    <span className="block truncate">{item.text}</span>
+                                    <ChevronRight className="w-3.5 h-3.5" />
                                   </button>
-                                ))}
-                              </nav>
-                            </div>
-                          </aside>
+                                </div>
+                                <nav className="space-y-0.5">
+                                  {renderedPreview.toc.map((item, idx) => (
+                                    <button
+                                      key={idx}
+                                      type="button"
+                                      onClick={() => scrollToHeading(item.id)}
+                                      className={`block w-full text-left text-[11px] leading-snug py-1 px-2 rounded transition-colors hover:bg-slate-100 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 ${
+                                        item.level === 1 ? 'font-semibold' : item.level === 2 ? 'pl-4' : 'pl-7 text-[10px]'
+                                      }`}
+                                      title={item.text}
+                                    >
+                                      <span className="block truncate">{item.text}</span>
+                                    </button>
+                                  ))}
+                                </nav>
+                              </div>
+                            </aside>
+                          )
                         )}
                       </div>
                     </div>
