@@ -324,25 +324,7 @@ export async function deleteGithubFile(relPath: string, sha: string, message?: s
         }
       }
 
-      // 自动检测：如果所有文档均被删除，重新生成默认 of index.mdx 和 meta.json 防止 404 崩溃
-      const tree = await getGitTree();
-      if (tree.length === 0) {
-        const defaultIndexContent = `---
-title: 首页
-description: 欢迎来到文档中心
----
 
-# 首页
-
-这是一个干净的开始。您现在可以通过后台页面创建新的文档，或者直接在此修改。`;
-        await fs.writeFile(path.join(docsDir, 'index.mdx'), defaultIndexContent, 'utf8');
-        
-        const defaultMetaContent = JSON.stringify({
-          title: "文档中心",
-          pages: ["index"]
-        }, null, 2);
-        await fs.writeFile(path.join(docsDir, 'meta.json'), defaultMetaContent, 'utf8');
-      }
     } catch (error: any) {
       if (error.code !== 'ENOENT') {
         throw error;
