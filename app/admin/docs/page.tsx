@@ -533,6 +533,7 @@ export default function AdminDocsPage() {
 
     while (i < lines.length) {
       const line = lines[i];
+      const startI = i;
 
       // --- Fenced code blocks ---
       const codeMatch = line.match(/^```(\S*)/);
@@ -697,6 +698,12 @@ export default function AdminDocsPage() {
       }
       if (paraLines.length > 0) {
         blocks.push(`<p class="mdp-p">${renderInline(escapeHtml(paraLines.join('\n')))}</p>`);
+      }
+
+      // Fallback: if no block matched and i wasn't advanced, increment i to avoid infinite loop
+      if (i === startI) {
+        blocks.push(`<p class="mdp-p">${renderInline(escapeHtml(lines[i]))}</p>`);
+        i++;
       }
     }
 
