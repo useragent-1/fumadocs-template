@@ -1183,7 +1183,7 @@ export default function AdminDocsPage() {
                                       }`}
                                       title={item.text}
                                     >
-                                      <span className="block truncate">{item.text}</span>
+                                      <span className="block whitespace-normal break-words">{item.text}</span>
                                     </button>
                                   ))}
                                 </nav>
