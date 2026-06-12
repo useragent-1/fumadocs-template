@@ -906,26 +906,28 @@ export default function AdminDocsPage() {
             <main className="flex-1 bg-slate-50 dark:bg-zinc-950 flex flex-col overflow-hidden">
               {selectedDoc || isNew ? (
                 <form onSubmit={handleSave} className="flex-1 flex flex-col overflow-hidden">
-                  {/* Form Top Toolbar */}
-                  <div className="bg-white dark:bg-zinc-900 px-6 py-3.5 flex items-center justify-between shrink-0">
-                    <div className="flex items-center gap-2">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                        isNew 
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-250 dark:bg-emerald-950/20 dark:text-emerald-450 dark:border-emerald-900' 
-                          : 'bg-zinc-100 text-zinc-700 border-zinc-250 dark:bg-zinc-800 dark:text-zinc-350 dark:border-zinc-750'
-                      }`}>
-                        {isNew ? '新建' : '编辑'}
-                      </span>
-                      <h2 className="text-xs font-bold truncate max-w-xs md:max-w-md">
-                        {isNew ? '新建文档' : editTitle}
-                      </h2>
-                    </div>
-                  </div>
-
                   {/* Form fields & Editor */}
                   <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
                     {/* Left Column */}
-                    <div className="w-full md:w-[460px] md:shrink-0 flex flex-col overflow-y-auto bg-white dark:bg-zinc-900 p-6 space-y-4">
+                    <div className="w-full md:w-[460px] md:shrink-0 flex flex-col bg-white dark:bg-zinc-900 overflow-hidden">
+                      {/* Left Column Toolbar */}
+                      <div className="px-6 py-3.5 flex items-center justify-between shrink-0">
+                        <div className="flex items-center gap-2">
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                            isNew 
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-250 dark:bg-emerald-950/20 dark:text-emerald-450 dark:border-emerald-900' 
+                              : 'bg-zinc-100 text-zinc-700 border-zinc-250 dark:bg-zinc-800 dark:text-zinc-350 dark:border-zinc-750'
+                          }`}>
+                            {isNew ? '新建' : '编辑'}
+                          </span>
+                          <h2 className="text-xs font-bold truncate max-w-xs md:max-w-md">
+                            {isNew ? '新建文档' : editTitle}
+                          </h2>
+                        </div>
+                      </div>
+
+                      {/* Left Column Content */}
+                      <div className="flex-1 overflow-y-auto p-6 pt-2 space-y-4 flex flex-col">
                       
                       {/* Document Title */}
                       <div className="shrink-0">
@@ -1055,8 +1057,9 @@ export default function AdminDocsPage() {
                         </div>
                       </div>
                     </div>
+                  </div>
 
-                    {/* Right Column: Preview */}
+                  {/* Right Column: Preview */}
                     <div className={`flex-1 flex flex-col bg-slate-50 dark:bg-zinc-950 overflow-hidden ${
                       activeTab === 'preview' ? 'block' : 'hidden md:flex'
                     }`}>
