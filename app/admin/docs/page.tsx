@@ -702,10 +702,25 @@ export default function AdminDocsPage() {
     return { html: blocks.join('\n'), toc };
   }, [escapeHtml, renderInline]);
 
+  // Debounce the preview rendering to prevent typing lag
+  const [debouncedContent, setDebouncedContent] = useState(editContent);
+
+  useEffect(() => {
+    // When switching documents or creating a new one, update immediately without debounce
+    setDebouncedContent(editContent);
+  }, [selectedDoc?.path, isNew]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedContent(editContent);
+    }, 250);
+    return () => clearTimeout(handler);
+  }, [editContent]);
+
   // Memoize rendered preview
   const renderedPreview = useMemo(() => {
-    return renderMarkdown(editContent);
-  }, [editContent, renderMarkdown]);
+    return renderMarkdown(debouncedContent);
+  }, [debouncedContent, renderMarkdown]);
 
   const scrollToHeading = useCallback((id: string) => {
     const el = document.getElementById(id);
