@@ -1081,7 +1081,7 @@ export default function AdminDocsPage() {
                               type="button"
                               onClick={handleDelete}
                               disabled={isLoading}
-                              className="h-7 px-3 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-all disabled:opacity-50 border border-rose-250 hover:bg-rose-50 text-rose-650 dark:border-rose-900/50 dark:hover:bg-rose-950/20 dark:text-rose-450 bg-white dark:bg-zinc-900"
+                              className="h-7 px-3.5 rounded-full text-[11px] font-semibold flex items-center gap-1.5 transition-all disabled:opacity-50 border border-rose-250 hover:bg-rose-50 text-rose-650 dark:border-rose-900/50 dark:hover:bg-rose-950/20 dark:text-rose-450 bg-white dark:bg-zinc-900"
                             >
                               <Trash2 className="w-3 h-3" />
                               删除文档
@@ -1090,7 +1090,7 @@ export default function AdminDocsPage() {
                           <button
                             type="submit"
                             disabled={isLoading}
-                            className="h-7 px-3.5 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-all disabled:opacity-50 border border-zinc-900 dark:border-white bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-100 shadow-sm"
+                            className="h-7 px-4 rounded-full text-[11px] font-semibold flex items-center gap-1.5 transition-all disabled:opacity-50 border border-zinc-900 dark:border-white bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-100 shadow-sm"
                           >
                             {isLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
                             保存
