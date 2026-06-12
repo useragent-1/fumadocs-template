@@ -24,6 +24,13 @@ function fromBase64(b64: string): string {
   }
 }
 
+function encodeGitPath(relPath: string): string {
+  return relPath
+    .split('/')
+    .map(segment => encodeURIComponent(segment))
+    .join('/');
+}
+
 async function fetchGithub(urlPath: string, options: RequestInit = {}) {
   const headers = new Headers(options.headers);
   headers.set('Authorization', `token ${GITHUB_TOKEN}`);
@@ -144,8 +151,9 @@ export async function getFileContent(relPath: string): Promise<{ content: string
   }
 
   try {
+    const encoded = encodeGitPath(relPath);
     const data = await fetchGithub(
-      `/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${relPath}?ref=${GITHUB_BRANCH}`
+      `/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${encoded}?ref=${GITHUB_BRANCH}`
     );
     
     const content = fromBase64(data.content.replace(/\s/g, ''));
@@ -200,12 +208,13 @@ export async function writeGithubFile(
 
   try {
     const base64Content = toBase64(content);
+    const encoded = encodeGitPath(relPath);
     let fileSha = sha;
     
     if (!fileSha || fileSha === 'local-sha') {
       try {
         const existingFile = await fetchGithub(
-          `/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${relPath}?ref=${GITHUB_BRANCH}`
+          `/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${encoded}?ref=${GITHUB_BRANCH}`
         );
         fileSha = existingFile.sha;
       } catch {
@@ -224,7 +233,7 @@ export async function writeGithubFile(
     }
 
     const data = await fetchGithub(
-      `/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${relPath}`,
+      `/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${encoded}`,
       {
         method: 'PUT',
         body: JSON.stringify(body),
@@ -240,10 +249,11 @@ export async function writeGithubFile(
       let parentPath = parts.slice(0, -1).join('/');
       while (parentPath !== 'content/docs' && parentPath.startsWith('content/docs')) {
         const metaPath = `${parentPath}/meta.json`;
+        const encodedMeta = encodeGitPath(metaPath);
         let metaExists = false;
         try {
           await fetchGithub(
-            `/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${metaPath}?ref=${GITHUB_BRANCH}`
+            `/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${encodedMeta}?ref=${GITHUB_BRANCH}`
           );
           metaExists = true;
         } catch {
@@ -257,7 +267,7 @@ export async function writeGithubFile(
           const metaBase64 = toBase64(metaContent);
           
           await fetchGithub(
-            `/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${metaPath}`,
+            `/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${encodedMeta}`,
             {
               method: 'PUT',
               body: JSON.stringify({
@@ -336,16 +346,17 @@ description: 欢迎来到文档中心
   }
 
   try {
+    const encoded = encodeGitPath(relPath);
     let fileSha = sha;
     if (!fileSha || fileSha === 'local-sha') {
       const existingFile = await fetchGithub(
-        `/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${relPath}?ref=${GITHUB_BRANCH}`
+        `/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${encoded}?ref=${GITHUB_BRANCH}`
       );
       fileSha = existingFile.sha;
     }
 
     await fetchGithub(
-      `/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${relPath}`,
+      `/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${encoded}`,
       {
         method: 'DELETE',
         body: JSON.stringify({
