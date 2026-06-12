@@ -920,28 +920,6 @@ export default function AdminDocsPage() {
                         {isNew ? '新建文档' : editTitle}
                       </h2>
                     </div>
-
-                    <div className="flex items-center gap-2">
-                      {!isNew && (
-                        <button
-                          type="button"
-                          onClick={handleDelete}
-                          disabled={isLoading}
-                          className="h-8 px-3.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all disabled:opacity-50 border border-rose-200 hover:bg-rose-50 text-rose-650 dark:border-rose-900/50 dark:hover:bg-rose-950/20 dark:text-rose-450"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                          删除文档
-                        </button>
-                      )}
-                      <button
-                        type="submit"
-                        disabled={isLoading}
-                        className="h-8 px-4 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all disabled:opacity-50 border border-zinc-900 dark:border-white bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-100 shadow-sm"
-                      >
-                        {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-                        保存
-                      </button>
-                    </div>
                   </div>
 
                   {/* Form fields & Editor */}
@@ -1018,6 +996,29 @@ export default function AdminDocsPage() {
                             </div>
                           </div>
                         )}
+
+                        {/* Action Buttons */}
+                        <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200/40 dark:border-zinc-800/40">
+                          {!isNew && (
+                            <button
+                              type="button"
+                              onClick={handleDelete}
+                              disabled={isLoading}
+                              className="h-8 px-3.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all disabled:opacity-50 border border-rose-250 hover:bg-rose-50 text-rose-650 dark:border-rose-900/50 dark:hover:bg-rose-950/20 dark:text-rose-450 bg-white dark:bg-zinc-900"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              删除文档
+                            </button>
+                          )}
+                          <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="h-8 px-4 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all disabled:opacity-50 border border-zinc-900 dark:border-white bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-100 shadow-sm"
+                          >
+                            {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                            保存
+                          </button>
+                        </div>
                       </div>
 
                       {/* Description */}
