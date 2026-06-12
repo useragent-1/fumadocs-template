@@ -310,7 +310,13 @@ export async function deleteGithubFile(relPath: string, sha: string, message?: s
       const docsDir = path.join(process.cwd(), 'content/docs');
       while (dir !== docsDir && dir.startsWith(docsDir)) {
         const files = await fs.readdir(dir);
-        if (files.length === 0) {
+        const hasOnlyMetaJson = files.length === 1 && files[0] === 'meta.json';
+        const isEmpty = files.length === 0;
+
+        if (isEmpty || hasOnlyMetaJson) {
+          if (hasOnlyMetaJson) {
+            await fs.unlink(path.join(dir, 'meta.json'));
+          }
           await fs.rmdir(dir);
           dir = path.dirname(dir);
         } else {
@@ -369,6 +375,56 @@ description: 欢迎来到文档中心
         },
       }
     );
+
+    // Clean up empty parent directories on GitHub (including deleting leftover meta.json files)
+    const parts = relPath.split('/');
+    if (parts.length > 2) {
+      let parentPath = parts.slice(0, -1).join('/');
+      while (parentPath !== 'content/docs' && parentPath.startsWith('content/docs')) {
+        const encodedParent = encodeGitPath(parentPath);
+        let items: any[] = [];
+        try {
+          items = await fetchGithub(
+            `/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${encodedParent}?ref=${GITHUB_BRANCH}`
+          );
+        } catch {
+          // Folder already gone or error
+          break;
+        }
+
+        // Filter out the deleted file if it's still returned in contents list
+        const remainingItems = items.filter(item => item.path !== relPath);
+
+        const hasOnlyMeta = remainingItems.length === 1 && remainingItems[0].name === 'meta.json';
+        const isEmpty = remainingItems.length === 0;
+
+        if (isEmpty || hasOnlyMeta) {
+          if (hasOnlyMeta) {
+            const metaPath = `${parentPath}/meta.json`;
+            const encodedMeta = encodeGitPath(metaPath);
+            await fetchGithub(
+              `/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${encodedMeta}`,
+              {
+                method: 'DELETE',
+                body: JSON.stringify({
+                  message: `Delete empty folder meta.json for ${parentPath.split('/').pop()}`,
+                  sha: remainingItems[0].sha,
+                  branch: GITHUB_BRANCH,
+                }),
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              }
+            ).catch(e => console.error('Failed to delete meta.json on GitHub:', e));
+          }
+          
+          const parentParts = parentPath.split('/');
+          parentPath = parentParts.slice(0, -1).join('/');
+        } else {
+          break;
+        }
+      }
+    }
   } catch (err: any) {
     console.error(`Failed to delete file ${relPath} from GitHub API:`, err);
     throw err;

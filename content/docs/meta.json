@@ -1,3 +1,6 @@
 {
-  "title": "文档中心"
+  "title": "文档中心",
+  "pages": [
+    "index"
+  ]
 }
