@@ -528,7 +528,7 @@ export default function AdminDocsPage() {
     if (!md) return { html: '<p class="mdp-empty">暂无内容，请在左侧编辑器中输入 Markdown 文本</p>', toc: [] };
 
     const toc: TocItem[] = [];
-    const lines = md.split('\n');
+    const lines = md.split('\n').map(line => line.replace(/\r$/, ''));
     const blocks: string[] = [];
     let i = 0;
 
