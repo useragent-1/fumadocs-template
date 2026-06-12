@@ -947,7 +947,7 @@ export default function AdminDocsPage() {
                   {/* Form fields & Editor */}
                   <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
                     {/* Left Column */}
-                    <div className="flex-1 flex flex-col overflow-y-auto border-r border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 space-y-4">
+                    <div className="w-full md:w-[460px] md:shrink-0 flex flex-col overflow-y-auto border-r border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 space-y-4">
                       
                       {/* Document Title */}
                       <div className="shrink-0">

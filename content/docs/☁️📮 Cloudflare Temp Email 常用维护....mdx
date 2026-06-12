@@ -1,0 +1,338 @@
+---
+title: "☁️📮 Cloudflare Temp Email 常用维护..."
+description: ""
+---
+# ☁️📮 Cloudflare Temp Email 常用维护命令手册
+
+> 📁 本地项目路径：`E:\cloudflare_projects\cloudflare_temp_email`
+> 🌐 前端正式地址：`https://cloudflare-temp-email-eyf.pages.dev`
+> 🔐 后台管理地址：`https://cloudflare-temp-email-eyf.pages.dev/admin`
+> ⚙️ Worker 后端地址：`https://cloudflare_temp_email.aethermail-26944.workers.dev`
+
+***
+
+## 🧭 一、基础入口
+
+### 1️⃣ 📁 进入项目目录
+
+```powershell
+Set-Location E:\cloudflare_projects\cloudflare_temp_email
+```
+
+### 2️⃣ 👤 查看 Cloudflare 登录状态
+
+```powershell
+wrangler.cmd whoami
+```
+
+如果尚未登录，执行：
+
+```powershell
+wrangler.cmd login
+```
+
+***
+
+## 🩺 二、检查服务状态
+
+### 3️⃣ ⚙️ 检查 Worker 后端是否正常
+
+🌐 浏览器打开：
+
+```text
+https://cloudflare_temp_email.aethermail-26944.workers.dev/health_check
+```
+
+如果页面显示：
+
+```text
+OK
+```
+
+说明 ⚙️ Worker 后端运行正常。
+
+也可以在 PowerShell 中执行：
+
+```powershell
+curl.exe https://cloudflare_temp_email.aethermail-26944.workers.dev/health_check
+```
+
+### 4️⃣ 🗄️ 查看 D1 数据库列表
+
+```powershell
+wrangler.cmd d1 list
+```
+
+### 5️⃣ 📜 查看 Worker 部署记录
+
+```powershell
+wrangler.cmd deployments list --name cloudflare_temp_email
+```
+
+如果该命令不可用，可以直接进入 Cloudflare 后台查看：
+
+```text
+Workers & Pages → cloudflare_temp_email → Deployments
+```
+
+***
+
+## 🔐 三、修改后台密码
+
+### 6️⃣ ✏️ 编辑 Worker 配置文件
+
+进入 ⚙️ Worker 目录并打开配置文件：
+
+```powershell
+Set-Location E:\cloudflare_projects\cloudflare_temp_email\worker
+notepad .\wrangler.toml
+```
+
+找到：
+
+```toml
+ADMIN_PASSWORDS = ["123456"]
+```
+
+改成你的强密码，例如：
+
+```toml
+ADMIN_PASSWORDS = ["MyOutMail@2026#Aether!792"]
+```
+
+💾 保存文件后，重新部署 Worker：
+
+```powershell
+pnpm.cmd run deploy
+```
+
+⚠️ 修改后台密码后，只需要重新部署 Worker，不需要重新部署前端 Pages。
+
+***
+
+## 🚀 四、重新部署服务
+
+### 7️⃣ ⚙️ 重新部署 Worker 后端
+
+当你修改了 `worker/wrangler.toml`、Worker 后端代码或环境变量后，执行：
+
+```powershell
+Set-Location E:\cloudflare_projects\cloudflare_temp_email\worker
+pnpm.cmd run deploy
+```
+
+适用场景：
+
+* 🔐 修改后台密码
+* 🌐 修改域名配置
+* ⚙️ 修改 Worker 后端代码
+* 🧩 修改环境变量
+
+### 8️⃣ 🌐 重新部署前端 Pages
+
+当前端代码或 `.env.local` 被修改后，执行：
+
+```powershell
+Set-Location E:\cloudflare_projects\cloudflare_temp_email\frontend
+pnpm.cmd build --emptyOutDir
+pnpm.cmd run deploy
+```
+
+✅ 部署成功后，继续使用正式前端地址：
+
+```text
+https://cloudflare-temp-email-eyf.pages.dev
+```
+
+🔐 后台管理地址：
+
+```text
+https://cloudflare-temp-email-eyf.pages.dev/admin
+```
+
+***
+
+## 🔗 五、修改前端连接的 Worker 地址
+
+### 9️⃣ ✏️ 编辑前端环境变量
+
+进入前端目录：
+
+```powershell
+Set-Location E:\cloudflare_projects\cloudflare_temp_email\frontend
+notepad .\.env.local
+```
+
+文件中应包含：
+
+```env
+VITE_API_BASE=https://cloudflare_temp_email.aethermail-26944.workers.dev
+```
+
+⚠️ 注意：地址末尾不要加 `/`。
+
+修改后重新部署前端：
+
+```powershell
+pnpm.cmd build --emptyOutDir
+pnpm.cmd run deploy
+```
+
+***
+
+## 📦 六、安装或恢复依赖
+
+如果以后重新下载项目，或者 `node_modules` 被删除，可以重新安装依赖。
+
+### 🔧 安装 Worker 依赖
+
+```powershell
+Set-Location E:\cloudflare_projects\cloudflare_temp_email\worker
+pnpm.cmd install
+```
+
+### 🎨 安装 Frontend 依赖
+
+```powershell
+Set-Location E:\cloudflare_projects\cloudflare_temp_email\frontend
+pnpm.cmd install
+```
+
+***
+
+## 🔄 七、更新项目代码
+
+如果项目是通过 `git clone` 下载的，可以执行：
+
+```powershell
+Set-Location E:\cloudflare_projects\cloudflare_temp_email
+git pull
+```
+
+更新后，建议重新安装依赖并重新部署：
+
+```powershell
+Set-Location E:\cloudflare_projects\cloudflare_temp_email\worker
+pnpm.cmd install
+pnpm.cmd run deploy
+
+Set-Location E:\cloudflare_projects\cloudflare_temp_email\frontend
+pnpm.cmd install
+pnpm.cmd build --emptyOutDir
+pnpm.cmd run deploy
+```
+
+如果项目是通过 ZIP 下载并解压的，`git pull` 不能使用，需要重新下载新版源码。
+
+***
+
+## 📩 八、测试随机邮箱收信
+
+不要使用下面这个地址测试：
+
+```text
+test@myoutmail.cc.cd
+```
+
+因为这个地址之前设置过转发到 Gmail，不会进入 Worker。
+
+建议使用随机地址测试：
+
+```text
+abc123@myoutmail.cc.cd
+hello888@myoutmail.cc.cd
+mail2026@myoutmail.cc.cd
+```
+
+只要 Catch-all 已经设置为发送到 Worker，理论上：
+
+```text
+任意名字@myoutmail.cc.cd
+```
+
+都可以进入临时邮箱系统。
+
+***
+
+## ☁️ 九、Cloudflare 后台检查位置
+
+### 📩 Email Routing 路由
+
+```text
+Cloudflare → myoutmail.cc.cd → 电子邮件 → 电子邮件路由 → 路由规则
+```
+
+确认设置为：
+
+```text
+兜底地址 / Catch-all：启用
+操作：发送到 Worker
+目标：cloudflare_temp_email
+```
+
+### ⚙️ Worker 后端
+
+```text
+Cloudflare → Workers & Pages → cloudflare_temp_email
+```
+
+### 🌐 Pages 前端
+
+```text
+Cloudflare → Workers & Pages → cloudflare-temp-email-eyf
+```
+
+***
+
+## 🚫 十、安全提醒
+
+### ❌ 不要随便执行
+
+不要执行：
+
+```powershell
+wrangler.cmd delete
+```
+
+该命令可能会删除 Cloudflare 上的 Worker。
+
+也不要随便删除 D1 数据库，否则邮件数据可能丢失。
+
+### 🔒 不要泄露敏感信息
+
+不要把下面这些内容发给别人：
+
+```text
+ADMIN_PASSWORDS
+JWT_SECRET
+Cloudflare Token
+D1 database_id
+```
+
+***
+
+## ⭐ 十一、最高频命令速查
+
+### A. 🔐 改密码后部署 Worker
+
+```powershell
+Set-Location E:\cloudflare_projects\cloudflare_temp_email\worker
+notepad .\wrangler.toml
+pnpm.cmd run deploy
+```
+
+### B. 🎨 改前端后部署 Pages
+
+```powershell
+Set-Location E:\cloudflare_projects\cloudflare_temp_email\frontend
+pnpm.cmd build --emptyOutDir
+pnpm.cmd run deploy
+```
+
+### C. 🩺 检查 Worker 是否正常
+
+```powershell
+curl.exe https://cloudflare_temp_email.aethermail-26944.workers.dev/health_check
+```
+
+🌐 浏览器看到 `OK` 就说明服务正常。
