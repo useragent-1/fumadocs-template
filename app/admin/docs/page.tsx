@@ -775,11 +775,11 @@ export default function AdminDocsPage() {
         <>
           {/* Top Header */}
           <header className="sticky top-0 z-30 bg-white/80 dark:bg-zinc-900/80 backdrop-blur px-6 py-4.5 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 p-2 rounded-lg shadow-sm">
-                <BookOpen className="w-4 h-4" />
+            <div className="flex items-center gap-3.5">
+              <div className="bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 p-2.5 rounded-xl shadow-sm">
+                <BookOpen className="w-5.5 h-5.5" />
               </div>
-              <h1 className="text-base font-bold tracking-tight">文档管理后台</h1>
+              <h1 className="text-xl font-bold tracking-tight">文档管理后台</h1>
             </div>
 
             <div className="flex items-center gap-4">
