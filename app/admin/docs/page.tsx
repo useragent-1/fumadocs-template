@@ -718,7 +718,7 @@ export default function AdminDocsPage() {
   const existingCategories = getExistingCategories();
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col font-sans transition-colors duration-200">
+    <div className="h-screen overflow-hidden bg-slate-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col font-sans transition-colors duration-200">
       
       {/* Login Screen */}
       {!isSecretSaved ? (
