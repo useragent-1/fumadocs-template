@@ -59,6 +59,14 @@ export default function AdminDocsPage() {
   
   const [editContent, setEditContent] = useState('');
   
+  const finalSlug = useMemo(() => {
+    const cleanCat = editCategory.trim().replace(/^\/|\/$/g, '');
+    const cleanPage = editPageSlug.trim().replace(/^\/|\/$/g, '');
+    
+    if (!cleanPage) return '';
+    return cleanCat ? `${cleanCat}/${cleanPage}` : cleanPage;
+  }, [editCategory, editPageSlug]);
+
   // UI State
   const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -172,17 +180,8 @@ export default function AdminDocsPage() {
     setActiveTab('edit');
   };
 
-  const getCombinedSlug = () => {
-    const cleanCat = editCategory.trim().replace(/^\/|\/$/g, '');
-    const cleanPage = editPageSlug.trim().replace(/^\/|\/$/g, '');
-    
-    if (!cleanPage) return '';
-    return cleanCat ? `${cleanCat}/${cleanPage}` : cleanPage;
-  };
-
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    const finalSlug = getCombinedSlug();
     if (!finalSlug) {
       showStatus('error', '页面路径不能为空');
       return;
@@ -282,13 +281,13 @@ export default function AdminDocsPage() {
   };
 
   // Get unique directories from existing docs list to show as autocomplete suggestions
-  const getExistingCategories = () => {
+  const existingCategories = useMemo(() => {
     const categories = docs.map(doc => {
       const { category } = parseSlug(doc.slug);
       return category;
     }).filter(cat => cat !== '');
     return Array.from(new Set(categories));
-  };
+  }, [docs]);
 
   const stringifyFrontmatter = (title: string, description: string, content: string) => {
     let fm = '---\n';
@@ -480,11 +479,13 @@ export default function AdminDocsPage() {
     }
   };
 
-  const filteredDocs = docs.filter(
-    (doc) =>
-      doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doc.slug.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredDocs = useMemo(() => {
+    return docs.filter(
+      (doc) =>
+        doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        doc.slug.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [docs, searchQuery]);
 
   // --- Improved Markdown Renderer ---
   const escapeHtml = useCallback((str: string) => {
@@ -729,8 +730,7 @@ export default function AdminDocsPage() {
     }
   }, []);
 
-  const finalSlug = getCombinedSlug();
-  const existingCategories = getExistingCategories();
+
 
   return (
     <div className="h-screen overflow-hidden bg-slate-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col font-sans transition-colors duration-200">
