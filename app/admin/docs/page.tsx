@@ -1095,12 +1095,7 @@ export default function AdminDocsPage() {
                             </span>
                           )}
                         </div>
-                        {renderedPreview.toc.length > 0 && (
-                          <div className="flex items-center gap-1 text-[10px] text-zinc-400">
-                            <List className="w-3 h-3" />
-                            {renderedPreview.toc.length} 个标题
-                          </div>
-                        )}
+
                       </div>
 
                       {/* Preview Content */}
@@ -1150,7 +1145,7 @@ export default function AdminDocsPage() {
                             <div className="sticky top-0 p-4">
                               <div className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
                                 <List className="w-3 h-3" />
-                                目录
+                                目录 ({renderedPreview.toc.length})
                               </div>
                               <nav className="space-y-0.5">
                                 {renderedPreview.toc.map((item, idx) => (
