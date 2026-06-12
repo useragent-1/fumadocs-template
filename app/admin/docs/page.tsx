@@ -1151,8 +1151,7 @@ export default function AdminDocsPage() {
                       </div>
                     </div>
                   </div>
-                </div>
-              </form>
+                </form>
             ) : (
               /* Empty State */
               <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
