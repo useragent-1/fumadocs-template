@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { 
   Plus, 
   Search, 
@@ -15,7 +15,17 @@ import {
   FolderPlus,
   Info,
   Download,
-  Upload
+  Upload,
+  Hash,
+  List,
+  ExternalLink,
+  Copy,
+  Check,
+  Table,
+  Minus,
+  AlertTriangle,
+  Lightbulb,
+  type LucideIcon
 } from 'lucide-react';
 import JSZip from 'jszip';
 
@@ -476,66 +486,233 @@ export default function AdminDocsPage() {
       doc.slug.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const renderMarkdown = (md: string) => {
-    if (!md) return '<p class="text-zinc-400 italic">空内容</p>';
-    
-    let html = md
+  // --- Improved Markdown Renderer ---
+  const escapeHtml = useCallback((str: string) => {
+    return str
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }, []);
 
-    // Fenced code blocks
-    html = html.replace(/```([\s\S]*?)```/g, (match, code) => {
-      const lines = code.trim().split('\n');
-      const lang = lines[0];
-      const codeContent = lines.slice(1).join('\n');
-      return `<pre class="bg-zinc-100 dark:bg-zinc-900 p-4 rounded-lg my-4 overflow-x-auto font-mono text-sm border border-zinc-200 dark:border-zinc-800 text-zinc-800 dark:text-zinc-200"><div class="text-xs text-zinc-400 mb-2 border-b border-zinc-200 dark:border-zinc-800 pb-1">${lang || 'code'}</div><code>${codeContent}</code></pre>`;
-    });
-
-    // Inline code
-    html = html.replace(/`([^`]+)`/g, '<code class="bg-zinc-100 dark:bg-zinc-900 px-1.5 py-0.5 rounded font-mono text-sm text-pink-600 dark:text-pink-400 border border-zinc-200 dark:border-zinc-850">$1</code>');
-
-    // Headers
-    html = html.replace(/^# (.*$)/gim, '<h1 class="text-3xl font-extrabold my-5 border-b pb-2 dark:border-zinc-800 text-zinc-900 dark:text-white">$1</h1>');
-    html = html.replace(/^## (.*$)/gim, '<h2 class="text-2xl font-bold my-4 border-b pb-1 dark:border-zinc-800 text-zinc-900 dark:text-white">$1</h2>');
-    html = html.replace(/^### (.*$)/gim, '<h3 class="text-xl font-semibold my-3 text-zinc-900 dark:text-white">$1</h3>');
-    html = html.replace(/^#### (.*$)/gim, '<h4 class="text-lg font-medium my-2 text-zinc-900 dark:text-white">$1</h4>');
-
-    // Bold & Italic
-    html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-    html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-
-    // Blockquotes
-    html = html.replace(/^\> (.*$)/gim, '<blockquote class="border-l-4 border-blue-500 pl-4 py-1 my-4 italic text-zinc-650 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-900/30">$1</blockquote>');
-
+  const renderInline = useCallback((text: string): string => {
+    let out = text;
+    // Images
+    out = out.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, 
+      '<img src="$2" alt="$1" class="mdp-img" />');
     // Links
-    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1">$1 ↗</a>');
+    out = out.replace(/\[([^\]]+)\]\(([^)]+)\)/g, 
+      '<a href="$2" target="_blank" rel="noopener noreferrer" class="mdp-link">$1<svg class="mdp-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>');
+    // Bold + Italic
+    out = out.replace(/\*\*\*([^*]+)\*\*\*/g, '<strong><em>$1</em></strong>');
+    // Bold
+    out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    // Italic
+    out = out.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    // Strikethrough
+    out = out.replace(/~~([^~]+)~~/g, '<del class="mdp-del">$1</del>');
+    // Inline code
+    out = out.replace(/`([^`]+)`/g, '<code class="mdp-inline-code">$1</code>');
+    return out;
+  }, []);
 
-    // List items
-    html = html.replace(/^\- (.*$)/gim, '<li class="list-disc ml-6 my-1.5 text-zinc-750 dark:text-zinc-300">$1</li>');
-    html = html.replace(/^\* (.*$)/gim, '<li class="list-disc ml-6 my-1.5 text-zinc-750 dark:text-zinc-300">$1</li>');
-    html = html.replace(/^\d+\. (.*$)/gim, '<li class="list-decimal ml-6 my-1.5 text-zinc-750 dark:text-zinc-300">$1</li>');
+  interface TocItem {
+    level: number;
+    text: string;
+    id: string;
+  }
 
-    const lines = html.split('\n');
-    html = lines
-      .map((line) => {
-        const trimmed = line.trim();
-        if (!trimmed) return '<br />';
-        if (
-          trimmed.startsWith('<h') ||
-          trimmed.startsWith('<pre') ||
-          trimmed.startsWith('<blockquote') ||
-          trimmed.startsWith('<li') ||
-          trimmed.startsWith('<br')
-        ) {
-          return line;
+  const renderMarkdown = useCallback((md: string): { html: string; toc: TocItem[] } => {
+    if (!md) return { html: '<p class="mdp-empty">暂无内容，请在左侧编辑器中输入 Markdown 文本</p>', toc: [] };
+
+    const toc: TocItem[] = [];
+    const lines = md.split('\n');
+    const blocks: string[] = [];
+    let i = 0;
+
+    while (i < lines.length) {
+      const line = lines[i];
+
+      // --- Fenced code blocks ---
+      const codeMatch = line.match(/^```(\S*)/);
+      if (codeMatch) {
+        const lang = codeMatch[1] || '';
+        const codeLines: string[] = [];
+        i++;
+        while (i < lines.length && !lines[i].startsWith('```')) {
+          codeLines.push(lines[i]);
+          i++;
         }
-        return `<p class="my-3 leading-relaxed text-zinc-700 dark:text-zinc-350">${line}</p>`;
-      })
-      .join('\n');
+        i++; // skip closing ```
+        const escaped = escapeHtml(codeLines.join('\n'));
+        blocks.push(
+          `<div class="mdp-code-block">` +
+          `<div class="mdp-code-header"><span class="mdp-code-lang">${lang || 'plaintext'}</span></div>` +
+          `<pre class="mdp-pre"><code>${escaped}</code></pre>` +
+          `</div>`
+        );
+        continue;
+      }
 
-    return html;
-  };
+      // --- Tables ---
+      const tableHeaderMatch = line.match(/^\|(.+)\|\s*$/);
+      if (tableHeaderMatch && i + 1 < lines.length && lines[i + 1].match(/^\|[\s:|-]+\|\s*$/)) {
+        const headers = tableHeaderMatch[1].split('|').map(h => h.trim());
+        // Parse alignment row
+        const alignRow = lines[i + 1].match(/^\|(.+)\|\s*$/);
+        const aligns: string[] = alignRow
+          ? alignRow[1].split('|').map(a => {
+              const t = a.trim();
+              if (t.startsWith(':') && t.endsWith(':')) return 'center';
+              if (t.endsWith(':')) return 'right';
+              return 'left';
+            })
+          : headers.map(() => 'left');
+        
+        let tableHtml = '<div class="mdp-table-wrap"><table class="mdp-table"><thead><tr>';
+        headers.forEach((h, idx) => {
+          tableHtml += `<th style="text-align:${aligns[idx] || 'left'}">${renderInline(escapeHtml(h))}</th>`;
+        });
+        tableHtml += '</tr></thead><tbody>';
+        
+        i += 2; // skip header and alignment rows
+        while (i < lines.length && lines[i].match(/^\|(.+)\|\s*$/)) {
+          const rowMatch = lines[i].match(/^\|(.+)\|\s*$/);
+          if (rowMatch) {
+            const cells = rowMatch[1].split('|').map(c => c.trim());
+            tableHtml += '<tr>';
+            cells.forEach((c, idx) => {
+              tableHtml += `<td style="text-align:${aligns[idx] || 'left'}">${renderInline(escapeHtml(c))}</td>`;
+            });
+            tableHtml += '</tr>';
+          }
+          i++;
+        }
+        tableHtml += '</tbody></table></div>';
+        blocks.push(tableHtml);
+        continue;
+      }
+
+      // --- Horizontal rule ---
+      if (line.match(/^(---|\*\*\*|___)\s*$/)) {
+        blocks.push('<hr class="mdp-hr" />');
+        i++;
+        continue;
+      }
+
+      // --- Blockquotes (multiline, with GitHub alert support) ---
+      if (line.match(/^>\s?/)) {
+        const quoteLines: string[] = [];
+        while (i < lines.length && lines[i].match(/^>\s?/)) {
+          quoteLines.push(lines[i].replace(/^>\s?/, ''));
+          i++;
+        }
+        const quoteContent = quoteLines.join('\n');
+        
+        // Detect GitHub-style alerts: [!NOTE], [!TIP], [!IMPORTANT], [!WARNING], [!CAUTION]
+        const alertMatch = quoteContent.match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*\n?([\s\S]*)/);
+        if (alertMatch) {
+          const alertType = alertMatch[1].toLowerCase();
+          const alertBody = alertMatch[2].trim();
+          const alertConfig: Record<string, { cls: string; label: string }> = {
+            note: { cls: 'mdp-alert-note', label: '📝 备注' },
+            tip: { cls: 'mdp-alert-tip', label: '💡 提示' },
+            important: { cls: 'mdp-alert-important', label: '❗ 重要' },
+            warning: { cls: 'mdp-alert-warning', label: '⚠️ 警告' },
+            caution: { cls: 'mdp-alert-caution', label: '🔴 注意' },
+          };
+          const cfg = alertConfig[alertType] || alertConfig.note;
+          blocks.push(
+            `<div class="mdp-alert ${cfg.cls}">` +
+            `<div class="mdp-alert-title">${cfg.label}</div>` +
+            `<div class="mdp-alert-body">${renderInline(escapeHtml(alertBody))}</div>` +
+            `</div>`
+          );
+        } else {
+          blocks.push(`<blockquote class="mdp-blockquote">${renderInline(escapeHtml(quoteContent))}</blockquote>`);
+        }
+        continue;
+      }
+
+      // --- Headers ---
+      const headerMatch = line.match(/^(#{1,6})\s+(.+)$/);
+      if (headerMatch) {
+        const level = headerMatch[1].length;
+        const text = headerMatch[2];
+        const id = text.replace(/[^\w\u4e00-\u9fff]+/g, '-').replace(/^-|-$/g, '').toLowerCase();
+        if (level <= 3) {
+          toc.push({ level, text, id });
+        }
+        const sizeClass = ['mdp-h1', 'mdp-h2', 'mdp-h3', 'mdp-h4', 'mdp-h5', 'mdp-h6'][level - 1];
+        blocks.push(`<h${level} id="${id}" class="${sizeClass}">${renderInline(escapeHtml(text))}<a href="#${id}" class="mdp-anchor" aria-hidden="true">#</a></h${level}>`);
+        i++;
+        continue;
+      }
+
+      // --- Unordered list (- or *) ---
+      if (line.match(/^\s*[-*]\s+/)) {
+        let listHtml = '<ul class="mdp-ul">';
+        while (i < lines.length && lines[i].match(/^\s*[-*]\s+/)) {
+          const itemText = lines[i].replace(/^\s*[-*]\s+/, '');
+          // Task list
+          const taskMatch = itemText.match(/^\[([ xX])\]\s*(.*)/);
+          if (taskMatch) {
+            const checked = taskMatch[1] !== ' ';
+            listHtml += `<li class="mdp-task-item"><span class="mdp-checkbox ${checked ? 'mdp-checked' : ''}">${checked ? '✓' : ''}</span>${renderInline(escapeHtml(taskMatch[2]))}</li>`;
+          } else {
+            listHtml += `<li>${renderInline(escapeHtml(itemText))}</li>`;
+          }
+          i++;
+        }
+        listHtml += '</ul>';
+        blocks.push(listHtml);
+        continue;
+      }
+
+      // --- Ordered list ---
+      if (line.match(/^\s*\d+\.\s+/)) {
+        let listHtml = '<ol class="mdp-ol">';
+        while (i < lines.length && lines[i].match(/^\s*\d+\.\s+/)) {
+          const itemText = lines[i].replace(/^\s*\d+\.\s+/, '');
+          listHtml += `<li>${renderInline(escapeHtml(itemText))}</li>`;
+          i++;
+        }
+        listHtml += '</ol>';
+        blocks.push(listHtml);
+        continue;
+      }
+
+      // --- Empty line ---
+      if (!line.trim()) {
+        i++;
+        continue;
+      }
+
+      // --- Paragraph: collect contiguous non-empty lines ---
+      const paraLines: string[] = [];
+      while (i < lines.length && lines[i].trim() && !lines[i].match(/^(#{1,6}\s|```|>\s?|\||---$|\*\*\*$|___$|\s*[-*]\s+|\s*\d+\.\s+)/)) {
+        paraLines.push(lines[i]);
+        i++;
+      }
+      if (paraLines.length > 0) {
+        blocks.push(`<p class="mdp-p">${renderInline(escapeHtml(paraLines.join('\n')))}</p>`);
+      }
+    }
+
+    return { html: blocks.join('\n'), toc };
+  }, [escapeHtml, renderInline]);
+
+  // Memoize rendered preview
+  const renderedPreview = useMemo(() => {
+    return renderMarkdown(editContent);
+  }, [editContent, renderMarkdown]);
+
+  const scrollToHeading = useCallback((id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, []);
 
   const finalSlug = getCombinedSlug();
   const existingCategories = getExistingCategories();
@@ -884,31 +1061,93 @@ export default function AdminDocsPage() {
                       activeTab === 'preview' ? 'block' : 'hidden md:flex'
                     }`}>
                       {/* Preview Toolbar */}
-                      <div className="bg-slate-100/50 dark:bg-zinc-900/40 border-b border-slate-200 dark:border-zinc-800 px-6 py-2 flex items-center justify-between shrink-0">
-                        <div className="flex items-center gap-1.5 text-zinc-400 text-[10px] font-bold uppercase tracking-wider">
-                          <Eye className="w-3 h-3" />
-                          预览
+                      <div className="bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm border-b border-slate-200 dark:border-zinc-800 px-5 py-2.5 flex items-center justify-between shrink-0">
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1.5 text-zinc-400 text-[10px] font-bold uppercase tracking-wider">
+                            <Eye className="w-3 h-3" />
+                            预览
+                          </div>
+                          {finalSlug && (
+                            <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono bg-slate-100 dark:bg-zinc-800 px-2 py-0.5 rounded">
+                              /docs/{finalSlug}
+                            </span>
+                          )}
                         </div>
+                        {renderedPreview.toc.length > 0 && (
+                          <div className="flex items-center gap-1 text-[10px] text-zinc-400">
+                            <List className="w-3 h-3" />
+                            {renderedPreview.toc.length} 个标题
+                          </div>
+                        )}
                       </div>
 
-                      {/* Preview Pane */}
-                      <div className="flex-1 overflow-y-auto p-8 bg-white dark:bg-zinc-900 md:bg-transparent md:dark:bg-transparent">
-                        <div className="max-w-2xl mx-auto prose prose-slate dark:prose-invert">
-                          {/* Title and Description preview */}
-                          <div className="mb-6 pb-6 border-b border-zinc-200 dark:border-zinc-800">
-                            <h1 className="text-3xl font-extrabold text-zinc-900 dark:text-white mb-2">
-                              {editTitle || '（无标题）'}
-                            </h1>
-                            <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed font-normal">
-                              {editDescription || '（无描述）'}
-                            </p>
-                          </div>
+                      {/* Preview Content */}
+                      <div className="flex-1 flex overflow-hidden">
+                        {/* Main preview pane */}
+                        <div className="flex-1 overflow-y-auto" id="preview-scroll-container">
+                          <div className="mdp-wrapper">
+                            {/* Breadcrumb */}
+                            {finalSlug && (
+                              <nav className="mdp-breadcrumb">
+                                <span>文档</span>
+                                {editCategory && (
+                                  <>
+                                    <ChevronRight className="w-3 h-3" />
+                                    <span>{editCategory}</span>
+                                  </>
+                                )}
+                                <ChevronRight className="w-3 h-3" />
+                                <span className="mdp-breadcrumb-current">{editPageSlug || editTitle}</span>
+                              </nav>
+                            )}
 
-                          {/* MDX Body preview */}
-                          <div 
-                            className="markdown-preview text-sm leading-relaxed"
-                            dangerouslySetInnerHTML={{ __html: renderMarkdown(editContent) }} 
-                        />
+                            {/* Document header */}
+                            <header className="mdp-doc-header">
+                              <h1 className="mdp-doc-title">
+                                {editTitle || '无标题文档'}
+                              </h1>
+                              {editDescription && (
+                                <p className="mdp-doc-desc">{editDescription}</p>
+                              )}
+                              {!editDescription && (
+                                <p className="mdp-doc-desc mdp-doc-desc-empty">暂无描述</p>
+                              )}
+                            </header>
+
+                            {/* Rendered markdown body */}
+                            <article 
+                              className="mdp-body"
+                              dangerouslySetInnerHTML={{ __html: renderedPreview.html }} 
+                            />
+                          </div>
+                        </div>
+
+                        {/* Table of Contents sidebar */}
+                        {renderedPreview.toc.length > 0 && (
+                          <aside className="hidden lg:flex flex-col w-52 shrink-0 border-l border-slate-200 dark:border-zinc-800 bg-white/40 dark:bg-zinc-900/20 overflow-y-auto">
+                            <div className="sticky top-0 p-4">
+                              <div className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                                <List className="w-3 h-3" />
+                                目录
+                              </div>
+                              <nav className="space-y-0.5">
+                                {renderedPreview.toc.map((item, idx) => (
+                                  <button
+                                    key={idx}
+                                    type="button"
+                                    onClick={() => scrollToHeading(item.id)}
+                                    className={`block w-full text-left text-[11px] leading-snug py-1 px-2 rounded transition-colors hover:bg-slate-100 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 ${
+                                      item.level === 1 ? 'font-semibold' : item.level === 2 ? 'pl-4' : 'pl-7 text-[10px]'
+                                    }`}
+                                    title={item.text}
+                                  >
+                                    <span className="block truncate">{item.text}</span>
+                                  </button>
+                                ))}
+                              </nav>
+                            </div>
+                          </aside>
+                        )}
                       </div>
                     </div>
                   </div>
