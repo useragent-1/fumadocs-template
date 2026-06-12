@@ -1149,7 +1149,7 @@ export default function AdminDocsPage() {
                             <button
                               type="button"
                               onClick={() => setIsTocCollapsed(false)}
-                              className="absolute right-6 top-1/4 z-20 bg-zinc-900/90 dark:bg-zinc-800/90 hover:bg-zinc-950 dark:hover:bg-zinc-750 text-white rounded-lg py-3 px-2 flex flex-col items-center gap-1 shadow-md border border-zinc-800 dark:border-zinc-700 transition-all text-[11px] font-bold leading-tight select-none cursor-pointer"
+                              className="absolute right-0 top-1/4 z-20 bg-zinc-900/90 dark:bg-zinc-800/90 hover:bg-zinc-950 dark:hover:bg-zinc-750 text-white rounded-l-lg py-3 px-2 flex flex-col items-center gap-1 shadow-md border border-r-0 border-zinc-800 dark:border-zinc-700 transition-all text-[11px] font-bold leading-tight select-none cursor-pointer"
                               title="展开目录"
                             >
                               <span>目</span>
