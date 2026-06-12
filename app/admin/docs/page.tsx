@@ -1156,7 +1156,7 @@ export default function AdminDocsPage() {
                               <span>录</span>
                             </button>
                           ) : (
-                            <aside className="hidden lg:flex flex-col w-52 shrink-0 bg-white/40 dark:bg-zinc-900/20 overflow-y-auto">
+                            <aside className="hidden lg:flex flex-col w-72 shrink-0 bg-white/40 dark:bg-zinc-900/20 overflow-y-auto">
                               <div className="sticky top-0 p-4">
                                 <div className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-3 flex items-center justify-between">
                                   <div className="flex items-center gap-1.5">
