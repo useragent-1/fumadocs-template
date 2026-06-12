@@ -1,9 +1,3 @@
 {
-  "title": "Documentation",
-  "pages": [
-    "index",
-    "getting-started",
-    "components",
-    "deployment"
-  ]
+  "title": "文档中心"
 }

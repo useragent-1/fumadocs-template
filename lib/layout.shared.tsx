@@ -7,7 +7,7 @@ import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 export function baseOptions(): BaseLayoutProps {
   return {
     nav: {
-      title: 'Fumadocs Template',
+      title: 'Fumadocs 文档模板',
       // Enable transparent mode for modern look
       transparentMode: 'top',
     },

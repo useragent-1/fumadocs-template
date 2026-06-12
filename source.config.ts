@@ -6,9 +6,23 @@ export const docs = defineDocs({
   dir: 'content/docs',
 });
 
+function remarkEnvAlias() {
+  return (tree: any) => {
+    const walk = (node: any) => {
+      if (node.type === 'code' && node.lang === 'env') {
+        node.lang = 'properties';
+      }
+      if (node.children) {
+        node.children.forEach(walk);
+      }
+    };
+    walk(tree);
+  };
+}
+
 export default defineConfig({
   mdxOptions: {
-    remarkPlugins: [remarkMath],
+    remarkPlugins: [remarkMath, remarkEnvAlias],
     rehypePlugins: (v) => [rehypeKatex, ...v],
   },
 });
