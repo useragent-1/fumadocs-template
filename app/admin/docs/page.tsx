@@ -1068,7 +1068,7 @@ export default function AdminDocsPage() {
                             预览
                           </div>
                           {finalSlug && (
-                            <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono bg-slate-100 dark:bg-zinc-800 px-2 py-0.5 rounded">
+                            <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono bg-slate-100 dark:bg-zinc-800 px-2.5 py-0.5 rounded-full relative -top-[1px]">
                               /docs/{finalSlug}
                             </span>
                           )}
