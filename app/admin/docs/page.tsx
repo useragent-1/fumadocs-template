@@ -960,7 +960,7 @@ export default function AdminDocsPage() {
                               onChange={(e) => setEditCategory(e.target.value)}
                               list="existing-directories"
                               placeholder="选择或输入新目录，例如：快速入门"
-                              className="w-full px-3 py-2 text-xs rounded-lg bg-white dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all font-medium"
+                              className="w-full px-3 py-2 text-xs rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all font-medium"
                             />
                             {/* Autocomplete list for directories */}
                             <datalist id="existing-directories">
@@ -980,7 +980,7 @@ export default function AdminDocsPage() {
                               value={editPageSlug}
                               onChange={(e) => setEditPageSlug(e.target.value)}
                               placeholder="例如：第一节"
-                              className="w-full px-3 py-2 text-xs rounded-lg bg-white dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all font-mono"
+                              className="w-full px-3 py-2 text-xs rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all font-mono"
                             />
                           </div>
                         </div>
