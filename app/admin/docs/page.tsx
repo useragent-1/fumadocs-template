@@ -773,7 +773,7 @@ export default function AdminDocsPage() {
         /* Logged In Dashboard */
         <>
           {/* Top Header */}
-          <header className="sticky top-0 z-30 bg-white/80 dark:bg-zinc-900/80 backdrop-blur border-b border-slate-200 dark:border-zinc-800 px-6 py-4.5 flex items-center justify-between">
+          <header className="sticky top-0 z-30 bg-white/80 dark:bg-zinc-900/80 backdrop-blur px-6 py-4.5 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 p-2 rounded-lg shadow-sm">
                 <BookOpen className="w-4 h-4" />
@@ -804,7 +804,7 @@ export default function AdminDocsPage() {
 
           <div className="flex-1 flex overflow-hidden">
             {/* Sidebar */}
-            <aside className="w-80 border-r border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col">
+            <aside className="w-80 bg-white dark:bg-zinc-900 flex flex-col">
               <div className="p-4 flex flex-col gap-3">
                 <button
                   onClick={handleNewDoc}
@@ -821,7 +821,7 @@ export default function AdminDocsPage() {
                     placeholder="搜索文档..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-950 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white focus:bg-white dark:focus:bg-zinc-900 transition-all font-medium"
+                    className="w-full pl-9 pr-4 py-2 text-xs rounded-lg bg-slate-50 dark:bg-zinc-950 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white focus:bg-white dark:focus:bg-zinc-900 transition-all font-medium"
                   />
                 </div>
               </div>
@@ -867,7 +867,7 @@ export default function AdminDocsPage() {
               </div>
 
               {/* Sidebar Footer for Import/Export */}
-              <div className="p-4 border-t border-slate-200 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/30 flex flex-col gap-2 shrink-0">
+              <div className="p-4 bg-slate-50/50 dark:bg-zinc-900/30 flex flex-col gap-2 shrink-0">
                 <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
                   数据管理 (Markdown)
                 </span>
@@ -876,7 +876,7 @@ export default function AdminDocsPage() {
                     type="button"
                     onClick={handleExportZip}
                     disabled={isLoading || docs.length === 0}
-                    className="py-1.5 px-3 rounded-lg text-xxs font-semibold border border-slate-200 dark:border-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:hover:bg-transparent cursor-pointer"
+                    className="py-1.5 px-3 rounded-lg text-xxs font-semibold hover:bg-slate-100 dark:hover:bg-zinc-800 transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:hover:bg-transparent cursor-pointer"
                   >
                     <Download className="w-3.5 h-3.5" />
                     一键导出
@@ -885,7 +885,7 @@ export default function AdminDocsPage() {
                     type="button"
                     onClick={() => document.getElementById('import-file-input')?.click()}
                     disabled={isLoading}
-                    className="py-1.5 px-3 rounded-lg text-xxs font-semibold border border-slate-200 dark:border-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:hover:bg-transparent cursor-pointer"
+                    className="py-1.5 px-3 rounded-lg text-xxs font-semibold hover:bg-slate-100 dark:hover:bg-zinc-800 transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:hover:bg-transparent cursor-pointer"
                   >
                     <Upload className="w-3.5 h-3.5" />
                     一键导入
@@ -907,7 +907,7 @@ export default function AdminDocsPage() {
               {selectedDoc || isNew ? (
                 <form onSubmit={handleSave} className="flex-1 flex flex-col overflow-hidden">
                   {/* Form Top Toolbar */}
-                  <div className="bg-white dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 px-6 py-3.5 flex items-center justify-between shrink-0">
+                  <div className="bg-white dark:bg-zinc-900 px-6 py-3.5 flex items-center justify-between shrink-0">
                     <div className="flex items-center gap-2">
                       <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                         isNew 
@@ -947,7 +947,7 @@ export default function AdminDocsPage() {
                   {/* Form fields & Editor */}
                   <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
                     {/* Left Column */}
-                    <div className="w-full md:w-[460px] md:shrink-0 flex flex-col overflow-y-auto border-r border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 space-y-4">
+                    <div className="w-full md:w-[460px] md:shrink-0 flex flex-col overflow-y-auto bg-white dark:bg-zinc-900 p-6 space-y-4">
                       
                       {/* Document Title */}
                       <div className="shrink-0">
@@ -960,12 +960,12 @@ export default function AdminDocsPage() {
                           value={editTitle}
                           onChange={(e) => setEditTitle(e.target.value)}
                           placeholder="例如：第一节的内容"
-                          className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-950 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white focus:bg-white dark:focus:bg-zinc-900 transition-all font-medium"
+                          className="w-full px-3 py-2 text-xs rounded-lg bg-slate-50 dark:bg-zinc-950 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white focus:bg-white dark:focus:bg-zinc-900 transition-all font-medium"
                         />
                       </div>
 
                       {/* Hierarchy Configuration (Extremely clear Page Slug + Folder Category) */}
-                      <div className="bg-slate-50 dark:bg-zinc-950 p-4 rounded-xl border border-slate-200 dark:border-zinc-850 space-y-3 shrink-0">
+                      <div className="bg-slate-50 dark:bg-zinc-950 p-4 rounded-xl space-y-3 shrink-0">
                         <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1">
                           <FolderPlus className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-350" />
                           所属折叠目录与页面路径
@@ -982,7 +982,7 @@ export default function AdminDocsPage() {
                               onChange={(e) => setEditCategory(e.target.value)}
                               list="existing-directories"
                               placeholder="选择或输入新目录，例如：快速入门"
-                              className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all font-medium"
+                              className="w-full px-3 py-2 text-xs rounded-lg bg-white dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all font-medium"
                             />
                             {/* Autocomplete list for directories */}
                             <datalist id="existing-directories">
@@ -1002,14 +1002,14 @@ export default function AdminDocsPage() {
                               value={editPageSlug}
                               onChange={(e) => setEditPageSlug(e.target.value)}
                               placeholder="例如：第一节"
-                              className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all font-mono"
+                              className="w-full px-3 py-2 text-xs rounded-lg bg-white dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all font-mono"
                             />
                           </div>
                         </div>
 
                         {/* Real-time routing path review */}
                         {editPageSlug.trim() && (
-                          <div className="bg-white dark:bg-zinc-900 px-3 py-2 rounded-lg border border-slate-150 dark:border-zinc-800 flex items-start gap-2">
+                          <div className="bg-white dark:bg-zinc-900 px-3 py-2 rounded-lg flex items-start gap-2">
                             <Info className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
                             <div className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium leading-relaxed">
                               页面生成链接: <code className="bg-slate-100 dark:bg-zinc-950 px-1 py-0.5 rounded font-mono text-blue-600 dark:text-blue-400 font-bold">/docs/{finalSlug}</code>
@@ -1030,7 +1030,7 @@ export default function AdminDocsPage() {
                           value={editDescription}
                           onChange={(e) => setEditDescription(e.target.value)}
                           placeholder="文档简短描述"
-                          className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-950 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white focus:bg-white dark:focus:bg-zinc-900 transition-all font-medium"
+                          className="w-full px-3 py-2 text-xs rounded-lg bg-slate-50 dark:bg-zinc-950 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white focus:bg-white dark:focus:bg-zinc-900 transition-all font-medium"
                         />
                       </div>
 
@@ -1070,7 +1070,7 @@ export default function AdminDocsPage() {
                             value={editContent}
                             onChange={(e) => setEditContent(e.target.value)}
                             placeholder="# 在此输入文档内容..."
-                            className={`w-full h-full p-4 rounded-lg border border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-950 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white focus:bg-white dark:focus:bg-zinc-900 transition-all font-mono text-xs resize-none leading-relaxed min-h-full ${
+                            className={`w-full h-full p-4 rounded-lg bg-slate-50 dark:bg-zinc-950 focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white focus:bg-white dark:focus:bg-zinc-900 transition-all font-mono text-xs resize-none leading-relaxed min-h-full ${
                               activeTab === 'edit' ? 'block' : 'hidden md:block'
                             }`}
                           />
@@ -1083,7 +1083,7 @@ export default function AdminDocsPage() {
                       activeTab === 'preview' ? 'block' : 'hidden md:flex'
                     }`}>
                       {/* Preview Toolbar */}
-                      <div className="bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm border-b border-slate-200 dark:border-zinc-800 px-5 py-2.5 flex items-center justify-between shrink-0">
+                      <div className="bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm px-5 py-2.5 flex items-center justify-between shrink-0">
                         <div className="flex items-center gap-2">
                           <div className="flex items-center gap-1.5 text-zinc-400 text-[10px] font-bold uppercase tracking-wider">
                             <Eye className="w-3 h-3" />
@@ -1146,7 +1146,7 @@ export default function AdminDocsPage() {
 
                         {/* Table of Contents sidebar */}
                         {renderedPreview.toc.length > 0 && (
-                          <aside className="hidden lg:flex flex-col w-52 shrink-0 border-l border-slate-200 dark:border-zinc-800 bg-white/40 dark:bg-zinc-900/20 overflow-y-auto">
+                          <aside className="hidden lg:flex flex-col w-52 shrink-0 bg-white/40 dark:bg-zinc-900/20 overflow-y-auto">
                             <div className="sticky top-0 p-4">
                               <div className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
                                 <List className="w-3 h-3" />

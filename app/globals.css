@@ -31,13 +31,10 @@
 }
 .dark .mdp-breadcrumb-current { color: #d1d5db; }
 
-/* Document header */
 .mdp-doc-header {
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
 }
-.dark .mdp-doc-header { border-color: #27272a; }
 
 .mdp-doc-title {
   font-size: 2rem;
