@@ -384,16 +384,33 @@ export default function AdminDocsPage() {
     setIsLoading(true);
     let importedCount = 0;
     let errorCount = 0;
+    let foundCount = 0;
+    let lastErrorMessage = '';
+
+    const cleanImportSlug = (filePath: string) => {
+      let clean = filePath.replace(/\\/g, '/');
+      // Remove content/docs/ or docs/ prefix if present (case-insensitive)
+      clean = clean.replace(/^content\/docs\//i, '');
+      clean = clean.replace(/^docs\//i, '');
+      // Remove any leading slashes
+      clean = clean.replace(/^\//, '');
+      // Strip extension (.md or .mdx) case-insensitive
+      return clean.replace(/\.mdx?$/i, '');
+    };
 
     try {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        if (file.name.endsWith('.zip')) {
+        const fileNameLower = file.name.toLowerCase();
+
+        if (fileNameLower.endsWith('.zip')) {
           const zip = await JSZip.loadAsync(file);
           const zipEntries: { path: string; contentPromise: Promise<string> }[] = [];
           
           zip.forEach((relativePath, zipEntry) => {
-            if (!zipEntry.dir && (relativePath.endsWith('.md') || relativePath.endsWith('.mdx'))) {
+            const entryNameLower = relativePath.toLowerCase();
+            // Ignore directories, __MACOSX system files, and only include .md/.mdx
+            if (!zipEntry.dir && !relativePath.startsWith('__MACOSX/') && (entryNameLower.endsWith('.md') || entryNameLower.endsWith('.mdx'))) {
               zipEntries.push({
                 path: relativePath,
                 contentPromise: zipEntry.async('string')
@@ -401,19 +418,23 @@ export default function AdminDocsPage() {
             }
           });
 
+          foundCount += zipEntries.length;
+
           for (const entry of zipEntries) {
             try {
               const fileContent = await entry.contentPromise;
               const { title, description, body } = parseFrontmatterClient(fileContent, entry.path);
-              const slug = entry.path.replace(/\.mdx?$/, '');
+              const slug = cleanImportSlug(entry.path);
               await importDocToServer(slug, title, description, body);
               importedCount++;
-            } catch (err) {
+            } catch (err: any) {
               console.error(`Failed to import ${entry.path} from ZIP:`, err);
+              lastErrorMessage = err.message || '网络或凭证错误';
               errorCount++;
             }
           }
-        } else if (file.name.endsWith('.md') || file.name.endsWith('.mdx')) {
+        } else if (fileNameLower.endsWith('.md') || fileNameLower.endsWith('.mdx')) {
+          foundCount++;
           try {
             const fileContent = await new Promise<string>((resolve, reject) => {
               const reader = new FileReader();
@@ -422,11 +443,12 @@ export default function AdminDocsPage() {
               reader.readAsText(file);
             });
             const { title, description, body } = parseFrontmatterClient(fileContent, file.name);
-            const slug = file.name.replace(/\.mdx?$/, '');
+            const slug = cleanImportSlug(file.name);
             await importDocToServer(slug, title, description, body);
             importedCount++;
-          } catch (err) {
+          } catch (err: any) {
             console.error(`Failed to import file ${file.name}:`, err);
+            lastErrorMessage = err.message || '网络或凭证错误';
             errorCount++;
           }
         }
@@ -435,8 +457,10 @@ export default function AdminDocsPage() {
       if (importedCount > 0) {
         showStatus('success', `成功导入 ${importedCount} 个文档${errorCount > 0 ? `，失败 ${errorCount} 个` : ''}`);
         await fetchDocs();
+      } else if (foundCount > 0 && errorCount > 0) {
+        showStatus('error', `导入失败：检测到 ${foundCount} 个文档，但保存全部失败。错误提示: ${lastErrorMessage}`);
       } else {
-        showStatus('error', '未找到可导入的 Markdown 文档');
+        showStatus('error', '未找到可导入的 Markdown 文档（仅支持 .zip, .md, .mdx 文件）');
       }
     } catch (err: any) {
       showStatus('error', `导入失败: ${err.message}`);
