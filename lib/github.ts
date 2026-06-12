@@ -154,6 +154,9 @@ export async function getFileContent(relPath: string): Promise<{ content: string
       sha: data.sha,
     };
   } catch (err: any) {
+    if (err.message && err.message.includes('404')) {
+      throw new Error(`File not found: ${relPath}`);
+    }
     console.error(`Failed to fetch file content for ${relPath} from GitHub API:`, err);
     throw err;
   }
