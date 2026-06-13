@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import Link from 'next/link';
 import { 
   Plus, 
   Search, 
@@ -25,6 +26,7 @@ import {
   Minus,
   AlertTriangle,
   Lightbulb,
+  Home,
   type LucideIcon
 } from 'lucide-react';
 import JSZip from 'jszip';
@@ -792,6 +794,14 @@ export default function AdminDocsPage() {
                   {statusMessage.text}
                 </div>
               )}
+
+              <Link 
+                href="/docs"
+                className="p-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-lg text-xs transition-all flex items-center gap-1.5 font-medium border border-transparent hover:border-slate-200 dark:hover:border-zinc-700"
+              >
+                <Home className="w-3.5 h-3.5" />
+                返回主页
+              </Link>
 
               <button 
                 onClick={clearSecret}
